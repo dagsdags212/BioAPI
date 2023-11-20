@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from Bio import Entrez, SeqIO
 from Bio.SeqRecord import SeqRecord
 from .Enums import *
@@ -15,6 +16,7 @@ class EntrezApi:
     def __init__(self, email: str = None, api_key: str = None, tool: str = None) -> None:
         """Stores user credentials upon instantiation, if given by the user."""
         self.credentials = Credentials(email=email, api_key=api_key, tool=tool)
+        self.records = {}
 
     def _send_credentials(self) -> None:
         """Sends user credentials to the Entrez server. Must be done for every request."""
@@ -50,4 +52,30 @@ class EntrezApi:
         }
         record = SeqIO.read(handle, fformats.get(rettype, "gb"))
         handle.close()
+        self.records[accession] = record
         return record
+
+    def save(self, accession: str, dir: Path, filename: str, fileformat: Fileformat) -> bool:
+        """
+        Writes a record to local memory. Returns True if the record is successfully saved.
+
+        Parameters
+        ==========
+        >> accession  (str) : an alphanumeric string that maps to the record
+        >> dir        (Path): base path of the target directory
+        >> filename   (str) : name for the record
+        >> fileformat (Enum): a valid Entrez file format
+
+        Returns
+        =======
+        A bool (True) if the operation succeeds, else raises an error
+        """
+        record = self.records.get(accession)
+        if record:
+            filepath = dir / Path(f"{filename}.{fileformat}")
+            with open(filepath, "w") as write_handle:
+                SeqIO.write(record, write_handle, fileformat)
+                return True
+        else:
+            err_message = "Invalid key. First run the `fetch_by_id` with the provided accession"
+            raise KeyError(err_message)
