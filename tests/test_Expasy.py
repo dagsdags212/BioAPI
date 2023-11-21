@@ -19,12 +19,6 @@ class TestExpasyApiClass(unittest.TestCase):
         record = self.app.fetch_from_id(self.acc)
         self.assertIsInstance(record, SwissProt.Record)
 
-    # def test_save_with_provided_dir(self):
-    #     """Expect that a default directory (`BioAPI_data`) will not be created"""
-    #     path = self.app.save(self.acc)
-    #     self.assertFalse(os.path.isdir(self.default_dir))
-    #     subprocess.run(["rm", "-rf", path])
-
     def test_save_without_provided_dir(self):
         """Expect that a default directory (`BioAPI_data`) will be created"""
         path = self.app.save(self.acc, self.acc+".txt")

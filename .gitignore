@@ -1,2 +1,7 @@
 __pycache__
 main.ipynb
+setup.py
+build
+dist
+BioAPI.egg-info
+bioapi.egg-info
